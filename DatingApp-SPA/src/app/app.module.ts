@@ -1,3 +1,5 @@
+import { MemberListResolver } from './_resolvers/member-list.resolver copy';
+import { MemberDetailResolver } from './_resolvers/member-detail.resolver';
 import { MemberDetailComponent } from './members/member-detail/member-detail.component';
 import { MemberCardComponent } from './members/member-card/member-card.component';
 import { UserService } from './_services/user.service';
@@ -54,7 +56,9 @@ export function tokengetter() {
    providers: [
       ErrorInterceptorProvider,
       AuthService,
-      UserService
+      UserService,
+      MemberDetailResolver,
+      MemberListResolver
    ],
    bootstrap: [
       AppComponent

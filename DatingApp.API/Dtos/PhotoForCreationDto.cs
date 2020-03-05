@@ -1,7 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Http;
 
-namespace DatingApp.API.Data
+namespace DatingApp.API.Dtos
 {
     public class PhotoForCreationDto
     {
@@ -15,4 +15,6 @@ namespace DatingApp.API.Data
             DateAdded = DateTime.Now;
         }
     }
+
+    
 }

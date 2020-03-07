@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using DatingApp.API.Data;
 using DatingApp.API.Dtos;
 using DatingApp.API.Models;
@@ -18,8 +19,10 @@ namespace DatingApp.API.Controllers
     {
         private readonly IAuthRepository _repo;
         private readonly IConfiguration _config;
-        public AuthController(IAuthRepository repo, IConfiguration config)
+        private readonly IMapper _mapper;
+        public AuthController(IAuthRepository repo, IConfiguration config, IMapper mapper)
         {
+            _mapper = mapper; // for main photo on nav bar 
             _config = config;
             _repo = repo;
         }
@@ -43,10 +46,8 @@ namespace DatingApp.API.Controllers
         }
         [HttpPost("Login")]
         public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
-        {            
-            //throw new Exception("computer says no!");
-
-            var userFromRepo = await _repo.Login(userForLoginDto.Username, userForLoginDto.Password);
+        {
+            var userFromRepo = await _repo.Login(userForLoginDto.Username, userForLoginDto.Password); //user has logged in, get all users photos and information
 
             if (userFromRepo == null)
                 return Unauthorized();
@@ -73,9 +74,15 @@ namespace DatingApp.API.Controllers
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            return Ok(new {
-                token = tokenHandler.WriteToken(token)
-            }); 
+            var user = _mapper.Map<UserForListDto>(userFromRepo); //this DTO gets the main photo url.
+
+            return Ok(new
+            {
+                token = tokenHandler.WriteToken(token),
+                //to allow main photo to be updated on nav bar without needing multiple API requests
+                //this will pass down the user information alongside the token, so not inside the token. 
+                user
+            });
         }
     }
 }

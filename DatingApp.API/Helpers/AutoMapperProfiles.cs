@@ -10,6 +10,8 @@ namespace DatingApp.API.Helpers
         public AutoMapperProfiles()
         {
             CreateMap<User, UserForListDto>()
+            //make it so that userForListDto only gets the main photo url. it connects userforlistDto to photos
+            //and selects the photo which has isMain boolean true.  
                 .ForMember(dest => dest.PhotoUrl, opt => 
                     opt.MapFrom(src => src.Photos.FirstOrDefault(p => p.IsMain).Url))
                 .ForMember(dest => dest.Age, 

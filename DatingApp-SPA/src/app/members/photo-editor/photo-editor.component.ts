@@ -1,6 +1,8 @@
+import { AlertifyService } from './../../_services/alertify.service';
+import { UserService } from './../../_services/user.service';
 import { AuthService } from './../../_services/auth.service';
 import { environment } from './../../../environments/environment';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FileUploader } from 'ng2-file-upload';
 import { Photo } from 'src/app/_models/photo';
 
@@ -11,13 +13,18 @@ import { Photo } from 'src/app/_models/photo';
 })
 export class PhotoEditorComponent implements OnInit {
   @Input() photos: Photo[];
+  @Output() getMemberPhotoChange = new EventEmitter<string>();
   uploader: FileUploader;
   hasBaseDropZoneOver = false;
   baseUrl = environment.apiUrl;
+  currentMain: Photo;
 
 
-
-  constructor(private authService: AuthService) { }
+  constructor(
+    private authService: AuthService,
+    private userService: UserService,
+    private alertify: AlertifyService
+    ) { }
 
   ngOnInit() {
     this.initializeUploader();
@@ -53,5 +60,23 @@ export class PhotoEditorComponent implements OnInit {
         this.photos.push(photo);
       }
     };
+  }
+
+  setMainPhoto(photo: Photo) {
+    this.userService.setMainPhoto(this.authService.decodedToken.nameid, photo.id).subscribe(() => { // set main photo to the backend
+      this.currentMain = this.photos.filter(p => p.isMain === true)[0]; // access the current main photo
+      this.currentMain.isMain = false; // set current main photo to false
+      photo.isMain = true; // set photo object that has been sent into this method as the main photo
+      // send the updated photo to authservice changememberphoto() method
+      // it will then update member-edit and navbar component photos.
+      this.authService.changeMemberPhoto(photo.url);
+      // Allows main photo to stay the same everywhere even after refreshing the web page.
+      this.authService.currentUser.photoUrl = photo.url;
+      localStorage.setItem('user', JSON.stringify(this.authService.currentUser));
+      // the emit will also trigger the updateMainPhoto() method in member-edit
+      // which will update the current photo to the one that has isMain to true
+    }, error => {
+      this.alertify.error(error);
+    });
   }
 }

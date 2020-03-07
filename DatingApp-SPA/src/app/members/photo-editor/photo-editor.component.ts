@@ -79,4 +79,20 @@ export class PhotoEditorComponent implements OnInit {
       this.alertify.error(error);
     });
   }
+
+
+  // delete method to delete photo
+  deletePhoto(id: number) {
+    // ask user if they are sure
+    this.alertify.confirm('Are you sure you want to delete this photo?', () => {
+      // run deletePhoto method from userService.
+      this.userService.deletePhoto(this.authService.decodedToken.nameid, id).subscribe(() => {
+        // remove photo from array thats stored locally.
+        this.photos.splice(this.photos.findIndex(p => p.id === id), 1);
+        this.alertify.success('photo has been deleted');
+      }, error => {
+        this.alertify.error('Failed to delete the photo');
+      });
+    });
+  }
 }

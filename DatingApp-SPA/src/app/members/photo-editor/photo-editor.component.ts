@@ -58,6 +58,13 @@ export class PhotoEditorComponent implements OnInit {
           isMain: res.isMain
         };
         this.photos.push(photo);
+        // update first photo sent to navbar and memberedit
+        if (photo.isMain) {
+          this.authService.changeMemberPhoto(photo.url);
+          // Allows main photo to stay the same everywhere even after refreshing the web page.
+          this.authService.currentUser.photoUrl = photo.url;
+          localStorage.setItem('user', JSON.stringify(this.authService.currentUser));
+        }
       }
     };
   }

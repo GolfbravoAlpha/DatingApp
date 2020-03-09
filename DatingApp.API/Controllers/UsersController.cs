@@ -25,12 +25,21 @@ namespace DatingApp.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetUsers()
+        public async Task<IActionResult> GetUsers([FromQuery]UserParams userParams)
         {
-            var users = await _repo.GetUsers();
+            //get users based on the pagination. so only get users who would be on page 2, therefore users from 6 to 10 only
+            //this returns back items, count, pageNumner and pageSize from pagedList.cs on the createSync() used by DatingRepository
+            var users = await _repo.GetUsers(userParams);
 
+            //now map the data to the dto to filter it not to show the users hashed passwords
             var userToReturn = _mapper.Map<IEnumerable<UserForListDto>>(users);
+  
+            //method from extensions used 
+            //the extension allows the pagination information to be added to the http response header to the client
+            Response.AddPagination(users.CurrentPage, 
+                users.PageSize, users.TotalCount, users.TotalPages);
 
+            //it returns the filtered users but also the pagination information in the header, as shown in the above code.
             return Ok(userToReturn);
         }
 

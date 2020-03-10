@@ -14,7 +14,6 @@ namespace DatingApp.API.Data
         public DatingRepository(DataContext context)
         {
             _context = context;
-
         }
         public void Add<T>(T entity) where T : class
         {
@@ -24,6 +23,13 @@ namespace DatingApp.API.Data
         public void Delete<T>(T entity) where T : class
         {
             _context.Remove(entity);
+        }
+
+        public async Task<Like> GetLike(int userId, int recipientId)
+        {
+            //check to see if the userid and recipientId already are in the database          
+            return await _context.Likes.FirstOrDefaultAsync(u => 
+                u.LikerId == userId && u.LikeeId == recipientId);
         }
 
         public async Task<Photo> GetMainPhotoForUser(int userId)
@@ -58,6 +64,20 @@ namespace DatingApp.API.Data
             //filter based on gender
             users = users.Where(u => u.Gender == userParams.Gender);
 
+            //check userparams likers and Likees is true
+            //is the inputed argument in the api parameter likers = true || likees == true
+            if(userParams.Likers)
+            {                
+                var userLikers = await GetUserLikes(userParams.UserId, userParams.Likers);
+                users = users.Where(u => userLikers.Contains(u.Id));
+            }
+
+            if(userParams.Likees)
+            {
+                var userLikees = await GetUserLikes(userParams.UserId, userParams.Likers);
+                users = users.Where(u => userLikees.Contains(u.Id));
+            }
+
             //filter based on age selected
             if(userParams.MinAge != 18 || userParams.MaxAge != 99)
             {
@@ -86,6 +106,27 @@ namespace DatingApp.API.Data
           
 
             return await PagedList<User>.CreateAsync(users, userParams.Pagenumber, userParams.PageSize);
+        }
+
+        //method to check the database if likee and liker exists in the database
+        private async Task<IEnumerable<int>> GetUserLikes(int id, bool likers)
+        {
+            //assigns the likee and liker data to the 'user' object
+            var user = await _context.Users
+                .Include(x => x.Likers)
+                .Include(x => x.Likees)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            //we want to either return a list of likers or a list of likees 
+            //if likers has been set to true, then return the list of people who have clicked like on the users profile 
+            if(likers)
+            {
+                return user.Likers.Where(u => u.LikeeId == id).Select(id => id.LikerId);
+            }
+            else
+            {
+                return user.Likees.Where(u => u.LikerId == id).Select(i => i.LikeeId);
+            }
         }
 
         public async Task<bool> SaveAll()

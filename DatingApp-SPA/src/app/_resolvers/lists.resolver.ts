@@ -8,12 +8,11 @@ import { Resolve, Router, ActivatedRouteSnapshot } from '@angular/router';
 
 
 @Injectable()
-export class MemberListResolver implements Resolve<User[]> {
+export class ListsResolver implements Resolve<User[]> {
     // send pagination argument into the parameter of the api
     pageNumber = 1;
     pageSize = 5;
-    likesParam = 'likers';
-
+    likesParam = 'Likers';
 
     constructor(
         private userService: UserService,
@@ -23,7 +22,7 @@ export class MemberListResolver implements Resolve<User[]> {
     resolve(route: ActivatedRouteSnapshot): Observable<User[]> {
         return this.userService.getUsers(this.pageNumber, this.pageSize, null, this.likesParam).pipe(
             catchError(error => {
-                this.alertify.error('Problem retreving data');
+                this.alertify.error('Problems retreving data');
                 this.router.navigate(['/home']);
                 return of(null);
             })

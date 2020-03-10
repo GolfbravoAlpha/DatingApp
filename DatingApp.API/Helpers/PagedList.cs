@@ -28,6 +28,7 @@ namespace DatingApp.API.Helpers
 
         //this method will return a new instance of a paged list 
         //IQueryable allows us to defer the execution of the request to get a bunch of users
+        //IQueryable<T> will allow users and message as it is generic 
         public static async Task<PagedList<T>> CreateAsync(IQueryable<T> source, 
             int pageNumber, int pageSize)
         {

@@ -18,7 +18,7 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   // this method is returning paginatedResult of type User[]
-  getUsers(page?, itemsPerPage?): Observable<PaginatedResult<User[]>> {
+  getUsers(page?, itemsPerPage?, userParams?): Observable<PaginatedResult<User[]>> {
     // user object to set as the padinatedResult for the generic class.
     // we have to create a new instance of this class with 'new PaginatedResult<User[]>()'
     const paginatedResult: PaginatedResult<User[]> = new PaginatedResult<User[]>();
@@ -30,6 +30,12 @@ export class UserService {
       // remember append means to put on the end of, therefore, the below goes at the end of the API url as shown above
       params = params.append('pageNumber', page);
       params = params.append('pageSize', itemsPerPage);
+    }
+
+    if (userParams != null) {
+      params = params.append('minAge', userParams.minAge);
+      params = params.append('maxAge', userParams.maxAge);
+      params = params.append('gender', userParams.gender);
     }
     return this.http.get<User[]>(this.baseUrl + 'users', { observe: 'response', params})
       .pipe(

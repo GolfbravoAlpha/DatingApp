@@ -1,7 +1,7 @@
 export interface Pagination {
     // replicate the information we're gettting from the paginationHeader.cs
     currentPage: number;
-    itemsPerPAge: number;
+    itemsPerPage: number;
     totalItems: number;
     totalPages: number;
 }

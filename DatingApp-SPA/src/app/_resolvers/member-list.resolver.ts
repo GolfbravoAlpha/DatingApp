@@ -9,6 +9,7 @@ import { Resolve, Router, ActivatedRouteSnapshot } from '@angular/router';
 
 @Injectable()
 export class MemberListResolver implements Resolve<User[]> {
+    // send pagination argument into the parameter of the api
     pageNumber = 1;
     pageSize = 5;
 

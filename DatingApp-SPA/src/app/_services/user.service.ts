@@ -17,7 +17,7 @@ export class UserService {
 
   constructor(private http: HttpClient) { }
 
-
+  // this method is returning paginatedResult of type User[]
   getUsers(page?, itemsPerPage?): Observable<PaginatedResult<User[]>> {
     // user object to set as the padinatedResult for the generic class.
     // we have to create a new instance of this class with 'new PaginatedResult<User[]>()'
@@ -36,6 +36,7 @@ export class UserService {
         map (response => {
           paginatedResult.result = response.body;
           if (response.headers.get('Pagination') != null) {
+            // convert from string back to object of the pagination
             paginatedResult.pagination = JSON.parse(response.headers.get('Pagination'))
           }
           return paginatedResult;

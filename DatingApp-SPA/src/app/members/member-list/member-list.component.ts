@@ -1,3 +1,4 @@
+import { Pagination, PaginatedResult } from './../../_models/pagination';
 import { ActivatedRoute } from '@angular/router';
 import { AlertifyService } from '../../_services/alertify.service';
 import { UserService } from '../../_services/user.service';
@@ -11,6 +12,7 @@ import { User } from '../../_models/user';
 })
 export class MemberListComponent implements OnInit {
   users: User[];
+  pagination: Pagination;
 
   constructor(
     private userService: UserService,
@@ -21,6 +23,26 @@ export class MemberListComponent implements OnInit {
   ngOnInit() {
     this.route.data.subscribe(data => {
       this.users = data['users'].result;
+      this.pagination = data['users'].pagination;
+    });
+  }
+
+  pageChanged(event: any): void {
+    this.pagination.currentPage = event.page;
+    // return the new users for the new batch of users
+    this.loadUsers();
+  }
+
+  // new batch of users method
+  loadUsers() {
+    // use the api method of 'http://localhost:5000/api/users?PageNumber=3&pageSize=3'
+    // using the 'userService' method of getUsers, inputing current page number and the size
+    this.userService.getUsers(this.pagination.currentPage, this.pagination.itemsPerPage)
+      .subscribe((res: PaginatedResult<User[]>) => {
+      this.users = res.result;
+      this.pagination = res.pagination;
+    }, error => {
+      this.alertify.error(error);
     });
   }
 }

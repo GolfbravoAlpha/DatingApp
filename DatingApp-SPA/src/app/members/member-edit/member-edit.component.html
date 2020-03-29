@@ -59,7 +59,8 @@
           </tab>
           <tab heading="Edit Photos">
             <!-- send user.photos from member-edit component down to photoEditComponent photo array 
-                  sending from parent to child the user array data -->
+                  sending from parent to child the user array data 
+                photo-editor uses the @Input() statement to receive the photo-->
             <app-photo-editor [photos]="user.photos"
               (getMemberPhotoChange)="updateMainPhoto($event)">
             </app-photo-editor>

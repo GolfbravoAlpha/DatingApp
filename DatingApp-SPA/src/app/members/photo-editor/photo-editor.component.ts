@@ -12,6 +12,7 @@ import { Photo } from 'src/app/_models/photo';
   styleUrls: ['./photo-editor.component.css']
 })
 export class PhotoEditorComponent implements OnInit {
+  // this input() is connected to member-edit "user.photos". it binds that data onto the 'photos' object below
   @Input() photos: Photo[];
   @Output() getMemberPhotoChange = new EventEmitter<string>();
   uploader: FileUploader;
